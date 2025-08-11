@@ -3,6 +3,9 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+## third-part
+nb_easy_tshark/third_part
+
 # User-specific files
 *.rsuser
 *.suo
