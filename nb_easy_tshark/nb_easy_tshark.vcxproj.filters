@@ -173,5 +173,8 @@
     <ClInclude Include="third_library\sqlite3\sqlite3.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="nb_easy_tshark.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
