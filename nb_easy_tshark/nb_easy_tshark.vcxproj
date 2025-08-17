@@ -103,7 +103,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalIncludeDirectories>E:\Proj\nb_easy_tshark\nb_easy_tshark\nb_easy_tshark\third_library;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>E:\Proj\nb_easy_tshark\nb_easy_tshark\nb_easy_tshark\third_library;E:\Proj\nb_easy_tshark\nb_easy_tshark\nb_easy_tshark\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -119,7 +119,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS.;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalIncludeDirectories>E:\Proj\nb_easy_tshark\nb_easy_tshark\nb_easy_tshark\third_library;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>E:\Proj\nb_easy_tshark\nb_easy_tshark\nb_easy_tshark\third_library;E:\Proj\nb_easy_tshark\nb_easy_tshark\nb_easy_tshark\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -127,15 +127,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ip2region_util.cpp" />
     <ClCompile Include="nb_easy_tshark.cpp" />
     <ClCompile Include="test\01test_read_hex.cpp" />
+    <ClCompile Include="test\02_ip2region.cpp" />
+    <ClCompile Include="test\03_ip2region_class.cpp" />
     <ClCompile Include="third_library\ip2region\xdb_bench.cc" />
     <ClCompile Include="third_library\ip2region\xdb_search.cc" />
     <ClCompile Include="third_library\loguru\loguru.cpp" />
     <ClCompile Include="third_library\sqlite3\sqlite3.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="nb_easy_tshark.h" />
+    <ClInclude Include="include\ip2region_util.h" />
+    <ClInclude Include="include\nb_easy_tshark.h" />
     <ClInclude Include="third_library\httplib\httplib.h" />
     <ClInclude Include="third_library\ip2region\xdb_bench.h" />
     <ClInclude Include="third_library\ip2region\xdb_search.h" />

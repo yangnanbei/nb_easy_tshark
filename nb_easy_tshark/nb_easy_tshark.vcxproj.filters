@@ -33,6 +33,15 @@
     <ClCompile Include="test\01test_read_hex.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="test\02_ip2region.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ip2region_util.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="test\03_ip2region_class.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="third_library\httplib\httplib.h">
@@ -176,7 +185,10 @@
     <ClInclude Include="third_library\sqlite3\sqlite3.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="nb_easy_tshark.h">
+    <ClInclude Include="include\ip2region_util.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\nb_easy_tshark.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
