@@ -24,7 +24,7 @@ struct PacketHeader {
 int test_main() {
     std::ifstream file("E:/Proj/nb_easy_tshark/pcap/10pkts.pcap", std::ios::binary);
     if (!file) {
-        std::cerr << "无法打开文件！\n";
+        std::cerr << "open file failed！\n";
         return 0;
     }
 
