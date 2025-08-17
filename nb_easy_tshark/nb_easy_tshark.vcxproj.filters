@@ -42,6 +42,9 @@
     <ClCompile Include="test\03_ip2region_class.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="TsharkManager.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="third_library\httplib\httplib.h">
@@ -189,6 +192,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="include\nb_easy_tshark.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\TsharkManager.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

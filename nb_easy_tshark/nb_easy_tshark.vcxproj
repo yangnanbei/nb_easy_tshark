@@ -136,6 +136,7 @@
     <ClCompile Include="third_library\ip2region\xdb_search.cc" />
     <ClCompile Include="third_library\loguru\loguru.cpp" />
     <ClCompile Include="third_library\sqlite3\sqlite3.c" />
+    <ClCompile Include="TsharkManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ip2region_util.h" />
@@ -187,6 +188,7 @@
     <ClInclude Include="third_library\rapidxml\rapidxml_print.hpp" />
     <ClInclude Include="third_library\rapidxml\rapidxml_utils.hpp" />
     <ClInclude Include="third_library\sqlite3\sqlite3.h" />
+    <ClInclude Include="include\TsharkManager.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
