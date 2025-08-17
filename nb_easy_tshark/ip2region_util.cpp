@@ -1,4 +1,4 @@
-#include <iostream>
+ï»¿#include <iostream>
 #include <string>
 #include <vector>
 #include <sstream>
@@ -34,8 +34,8 @@ std::string IP2RegionUtil::parseLocation(const std::string& input) {
     std::string token;
     std::stringstream ss(input);
 
-    if (input.find("ÄÚÍø") != std::string::npos) {
-        return "ÄÚÍø";
+    if (input.find("å†…ç½‘") != std::string::npos) {
+        return "å†…ç½‘";
     }
 
     while (std::getline(ss, token, '|')) {

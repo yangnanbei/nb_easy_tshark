@@ -1,8 +1,9 @@
-﻿#include "include/nb_easy_tshark.h"
-#include "rapidjson/document.h"
+﻿#include "rapidjson/document.h"
 #include "rapidjson/writer.h"
 #include "rapidjson/prettywriter.h"
 #include "rapidjson/stringbuffer.h"
+#include "nb_easy_tshark.h"
+#include "ip2region_util.h"
 
 bool parseLine(std::string line, Packet& packet) {
     if (line.back() == '\n') {
@@ -72,7 +73,9 @@ void printPacket(const Packet& packet) {
     pktObj.AddMember("frame_number", packet.frame_number, allocator);
     pktObj.AddMember("timestamp", rapidjson::Value(packet.time.c_str(), allocator), allocator);
     pktObj.AddMember("src_ip", rapidjson::Value(packet.src_ip.c_str(), allocator), allocator);
+    pktObj.AddMember("src_location", rapidjson::Value(IP2RegionUtil::getIpLocation(packet.src_ip).c_str(), allocator), allocator);
     pktObj.AddMember("dst_ip", rapidjson::Value(packet.dst_ip.c_str(), allocator), allocator);
+    pktObj.AddMember("dst_location", rapidjson::Value(IP2RegionUtil::getIpLocation(packet.dst_ip).c_str(), allocator), allocator);
     pktObj.AddMember("src_port", packet.src_port, allocator);
     pktObj.AddMember("dst_port", packet.dst_port, allocator);
     pktObj.AddMember("protocol", rapidjson::Value(packet.protocol.c_str(), allocator), allocator);
@@ -118,6 +121,8 @@ int main()
     bool ret;
     // if you need to handle Chinese characters in the output, use setlocale
     setlocale(LC_ALL, "zh_CN.UTF-8"); 
+    IP2RegionUtil ip2regionUtil;
+    ip2regionUtil.init("third_library/ip2region/ip2region.xdb");
     std::string packet_file = "E:/Proj/nb_easy_tshark/pcap/10pkts.pcap";
 
     std::string read_pcap_cmd = "tshark \

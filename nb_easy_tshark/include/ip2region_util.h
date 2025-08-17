@@ -1,4 +1,4 @@
-#include "ip2region/xdb_search.h"
+﻿#include "ip2region/xdb_search.h"
 
 #include <string>
 #include <memory>
