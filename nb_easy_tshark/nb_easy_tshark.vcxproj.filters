@@ -30,6 +30,9 @@
     <ClCompile Include="third_library\sqlite3\sqlite3.c">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="test\01test_read_hex.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="third_library\httplib\httplib.h">

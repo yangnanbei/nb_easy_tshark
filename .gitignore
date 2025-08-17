@@ -5,6 +5,7 @@
 
 ## third-part
 nb_easy_tshark/third_library
+*.exe
 
 # User-specific files
 *.rsuser

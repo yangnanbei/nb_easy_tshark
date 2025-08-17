@@ -128,6 +128,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="nb_easy_tshark.cpp" />
+    <ClCompile Include="test\01test_read_hex.cpp" />
     <ClCompile Include="third_library\ip2region\xdb_bench.cc" />
     <ClCompile Include="third_library\ip2region\xdb_search.cc" />
     <ClCompile Include="third_library\loguru\loguru.cpp" />

@@ -92,8 +92,8 @@ void printPacket(const Packet& packet) {
 int main()
 {
     bool ret;
-    // if you need to handle Chinese characters in the output, uncomment this line
-    // setlocale(LC_ALL, "zh_CN.UTF-8"); 
+    // if you need to handle Chinese characters in the output, use setlocale
+    setlocale(LC_ALL, "zh_CN.UTF-8"); 
     std::string packet_file = "E:/Proj/nb_easy_tshark/pcap/10pkts.pcap";
 
     std::string read_pcap_cmd = "tshark \
