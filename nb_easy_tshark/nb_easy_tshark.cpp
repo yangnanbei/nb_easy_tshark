@@ -33,9 +33,8 @@ bool readPacketHex(const std::string& packet_file, uint32_t file_offset,
 
 int main()
 {
-    bool ret;
-    // if you need to handle Chinese characters in the output, use setlocale
     setlocale(LC_ALL, "zh_CN.UTF-8"); 
+
     std::string packet_file = "E:/Proj/nb_easy_tshark/pcap/10pkts.pcap";
     std::string wrk_dir = "E:/Proj/nb_easy_tshark/nb_easy_tshark/nb_easy_tshark";
 
