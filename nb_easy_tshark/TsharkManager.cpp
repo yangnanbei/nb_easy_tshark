@@ -1,4 +1,4 @@
-#include "TsharkManager.hpp"
+ï»¿#include "TsharkManager.hpp"
 
 TsharkManager::TsharkManager(std::string workDir) {
     this->tsharkPath = "tshark"; /* I currently set it to my sys env */
@@ -25,7 +25,7 @@ bool TsharkManager::parseLine(std::string line, std::shared_ptr<Packet> packet) 
     fields.push_back(line.substr(start)); 
 
     /*
-     * fields£º
+     * fieldsï¼š
      * 0. frame.number
      * 1. frame.time_epoch
      * 2. frame.len
