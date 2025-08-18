@@ -140,7 +140,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ip2region_util.h" />
-    <ClInclude Include="include\nb_easy_tshark.h" />
+    <ClInclude Include="include\tshark_datatype.hpp" />
     <ClInclude Include="third_library\httplib\httplib.h" />
     <ClInclude Include="third_library\ip2region\xdb_bench.h" />
     <ClInclude Include="third_library\ip2region\xdb_search.h" />

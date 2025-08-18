@@ -191,10 +191,10 @@
     <ClInclude Include="include\ip2region_util.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="include\nb_easy_tshark.h">
+    <ClInclude Include="include\TsharkManager.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="include\TsharkManager.hpp">
+    <ClInclude Include="include\tshark_datatype.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

@@ -13,6 +13,11 @@ bool IP2RegionUtil::init(const std::string& xdbFilePath) {
     return true;
 }
 
+bool IP2RegionUtil::uninit() {
+    xdbPtr.reset();
+    return true;
+}
+
 std::string IP2RegionUtil::getIpLocation(const std::string& ip) {
 
     //if is IPv6, return empty string

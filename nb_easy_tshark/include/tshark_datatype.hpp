@@ -25,14 +25,17 @@ struct PacketHeader {
 struct Packet {
     int frame_number;
     std::string time;
+    std::string src_mac;
+    std::string dst_mac;
     uint32_t cap_len;
+    uint32_t len;
     std::string src_ip;
+    std::string src_location;
     uint16_t src_port;
     std::string dst_ip;
+    std::string dst_location;
     uint16_t dst_port;
     std::string protocol;
     std::string info;
     uint32_t file_offset;
 };
-
-bool parseLine(std::string line, Packet& packet);

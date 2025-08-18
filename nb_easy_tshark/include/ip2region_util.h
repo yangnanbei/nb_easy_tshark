@@ -1,4 +1,5 @@
-﻿#include "ip2region/xdb_search.h"
+﻿#pragma once
+#include "ip2region/xdb_search.h"
 
 #include <string>
 #include <memory>
@@ -6,6 +7,7 @@
 class IP2RegionUtil {
 public:
     static bool init(const std::string& xdbFilePath);
+    static bool uninit();
     static std::string getIpLocation(const std::string& ip);
 
 private:
