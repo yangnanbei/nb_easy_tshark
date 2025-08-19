@@ -2,6 +2,7 @@
 #include "rapidjson/writer.h"
 #include "rapidjson/prettywriter.h"
 #include "rapidjson/stringbuffer.h"
+#include "loguru/loguru.hpp"
 #include "TsharkManager.hpp"
 #include "ip2region_util.h"
 
@@ -11,12 +12,12 @@ bool readPacketHex(const std::string& packet_file, uint32_t file_offset,
     buffer.resize(length);
     FILE* file = fopen(packet_file.c_str(), "rb");
     if (!file) {
-        std::cerr << "Failed to open file: " << packet_file << std::endl;
+        LOG_F(ERROR, "Failed to open file: %s", packet_file.c_str());
         buffer.clear();
         return false;
     }
     if (fseek(file, file_offset, SEEK_SET) != 0) {
-        std::cerr << "Failed to seek to offset: " << file_offset << std::endl;
+        LOG_F(ERROR, "Failed to seek to offset %u in file: %s", file_offset, packet_file.c_str());
         fclose(file);
         buffer.clear();
         return false;
@@ -24,16 +25,18 @@ bool readPacketHex(const std::string& packet_file, uint32_t file_offset,
     size_t bytesRead = fread(buffer.data(), 1, length, file);
     fclose(file);
     if (bytesRead != length) {
-        std::cerr << "Failed to read data from file. Expected: " << length << ", got: " << bytesRead << std::endl;
+        LOG_F(ERROR, "Failed to read %u bytes from file: %s (read %zu bytes)", length, packet_file.c_str(), bytesRead);
         buffer.resize(bytesRead);
         return false;
     }
     return true;
 }
 
-int main()
+int main(int argc, char *argv[])
 {
     setlocale(LC_ALL, "zh_CN.UTF-8"); 
+    loguru::init(argc, argv);
+    loguru::add_file("nb_easy_tshark.log", loguru::Append, loguru::Verbosity_MAX);
 
     std::string packet_file = "E:/Proj/nb_easy_tshark/pcap/10pkts.pcap";
     std::string wrk_dir = "E:/Proj/nb_easy_tshark/nb_easy_tshark/nb_easy_tshark";
