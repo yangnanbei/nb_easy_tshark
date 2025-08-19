@@ -13,6 +13,7 @@
 #include <iostream>
 #include <fstream>
 #include <unordered_map>
+#include <set>
 
 class TsharkManager
 {
@@ -25,6 +26,8 @@ public:
     void printAllPacket();
 
     bool getPacketHexData(uint32_t frameNumber, std::vector<unsigned char>& data);
+
+    std::vector<AdapterInfo> getNetWorkAdapters();
 
 private:
     bool parseLine(std::string line, std::shared_ptr<Packet> packet);

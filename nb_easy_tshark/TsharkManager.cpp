@@ -1,4 +1,5 @@
 ﻿#include "TsharkManager.hpp"
+#include <loguru/loguru.hpp>
 
 TsharkManager::TsharkManager(std::string workDir) {
     this->tsharkPath = "tshark"; /* I currently set it to my sys env */
@@ -169,7 +170,7 @@ void TsharkManager::printAllPacket() {
         rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
         pktObj.Accept(writer);
 
-        std::cout << buffer.GetString() << std::endl;
+        LOG_F(INFO, "Packet %d: %s", packet->frame_number, buffer.GetString());
     }
 }
 
@@ -177,4 +178,79 @@ bool TsharkManager::getPacketHexData(uint32_t frameNumber, std::vector<unsigned 
     std::vector<unsigned char> buffer;
     // todo: implement readPacketHex
     return true;
+}
+
+
+std::vector<AdapterInfo> TsharkManager::getNetWorkAdapters() {
+    /* need filter some special interface which are not real network adapter */
+    std::set<std::string> specialInterface = {
+        "ciscodump",
+        "etwdump",
+        "sshdump.exe",
+        "udpdump",
+        "wifidump.exe",
+    };
+
+    /* real world interface */
+    std::vector<AdapterInfo> interfaces;
+
+    char buffer[512]{};
+    std::string result;
+
+    std::string command = tsharkPath + " -D";
+    FILE* pipe = _popen(command.c_str(), "r");
+    if (!pipe) {
+        throw std::runtime_error("Failed to run command: " + command);
+    }
+
+    while (fgets(buffer, sizeof(buffer), pipe) != nullptr) {
+        result += buffer;
+    }
+
+    /* get name and remark
+     * e.g: 6. \Device\NPF_{FFCB4D95-E737-4DCA-B016-522C9BA641B5} (WLAN)
+     * id:6
+     * name:\Device\NPF_{FFCB4D95-E737-4DCA-B016-522C9BA641B5}
+     * remark:WLAN
+     */
+    std::istringstream stream(result);
+    std::string line;
+    int id = 0;
+    while (std::getline(stream, line)) {
+        if (line.empty()) {
+            continue;
+        }
+        int start = line.find(' ');
+        if (start != std::string::npos) {
+            int end = line.find(' ', start + 1);
+            std::string ifName;
+            if (end != std::string::npos) {
+                 ifName = line.substr(start + 1, end - start - 1);
+            }
+            else {
+                 ifName = line.substr(start + 1);
+            }
+            
+            if (specialInterface.find(ifName) != specialInterface.end()) {
+                continue;
+            }
+
+            AdapterInfo adapter;
+            adapter.id = ++id;
+            adapter.name = ifName;
+
+            int bracketStart = line.find('(');
+            int bracketEnd   = line.rfind(')'); /* on I'm fucking genius */
+            if (bracketStart != std::string::npos && bracketEnd != std::string::npos && bracketEnd > bracketStart) {
+                adapter.remark = line.substr(bracketStart + 1, bracketEnd - bracketStart - 1);
+            } else {
+                adapter.remark = "Unknown";
+            }
+
+            interfaces.push_back(adapter);
+        }
+    }
+
+    _pclose(pipe);
+    return interfaces;
 }

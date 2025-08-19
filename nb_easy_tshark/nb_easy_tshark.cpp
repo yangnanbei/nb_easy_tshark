@@ -46,6 +46,11 @@ int main(int argc, char *argv[])
 
     tsharkManager.printAllPacket();
 
+    std::vector<AdapterInfo> adapters = tsharkManager.getNetWorkAdapters();
+    for (auto item: adapters) {
+        LOG_F(INFO, "Adapter ID: %d, Name: %s, Remark: %s", item.id, item.name.c_str(), item.remark.c_str());
+    }
+
     return 0;
 }
 

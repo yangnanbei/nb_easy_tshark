@@ -39,3 +39,15 @@ struct Packet {
     std::string info;
     uint32_t file_offset;
 };
+
+/* e.g: 6. \Device\NPF_{FFCB4D95-E737-4DCA-B016-522C9BA641B5} (WLAN)
+ * id:6
+ * name:\Device\NPF_{FFCB4D95-E737-4DCA-B016-522C9BA641B5}
+ * remark:WLAN
+ */
+struct AdapterInfo {
+    int id;
+    std::string name;
+    std::string remark;
+};
+
