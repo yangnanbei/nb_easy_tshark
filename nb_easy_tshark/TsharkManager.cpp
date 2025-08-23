@@ -256,10 +256,11 @@ std::vector<AdapterInfo> TsharkManager::getNetWorkAdapters() {
 }
 
 bool TsharkManager::startCapture(std::string adapterName) {
-    
     LOG_F(INFO, "start to capture, adapterName %s", adapterName.c_str());
+    stopFlag = false;
     captureWorkerThread =  std::make_shared<std::thread>(&TsharkManager::captureWorkerThreadEntry,
         this, "\"" + adapterName + "\"");
+
     return true;
 }
 
