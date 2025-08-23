@@ -6,6 +6,8 @@
 ## third-part
 nb_easy_tshark/third_library
 *.exe
+*.pcap
+*vcxproj* # visual studio setting files
 
 # User-specific files
 *.rsuser

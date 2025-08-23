@@ -14,6 +14,7 @@
 #include <fstream>
 #include <unordered_map>
 #include <set>
+#include <thread>
 
 class TsharkManager
 {
@@ -29,12 +30,21 @@ public:
 
     std::vector<AdapterInfo> getNetWorkAdapters();
 
+    bool startCapture(std::string adapterName);
+
+    bool stopCapture();
+
 private:
     bool parseLine(std::string line, std::shared_ptr<Packet> packet);
+
+    void captureWorkerThreadEntry(std::string adapterName);
+
+    std::shared_ptr<std::thread> captureWorkerThread;
 
 private:
     std::string tsharkPath;
     std::string currentFilePath;
+    bool stopFlag = false;              /* stop capture process */
 
     IP2RegionUtil ip2regionUtil;
 

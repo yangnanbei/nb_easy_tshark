@@ -38,18 +38,28 @@ int main(int argc, char *argv[])
     loguru::init(argc, argv);
     loguru::add_file("nb_easy_tshark.log", loguru::Append, loguru::Verbosity_MAX);
 
-    std::string packet_file = "E:/Proj/nb_easy_tshark/pcap/10pkts.pcap";
     std::string wrk_dir = "E:/Proj/nb_easy_tshark/nb_easy_tshark/nb_easy_tshark";
 
     TsharkManager tsharkManager(wrk_dir);
-    tsharkManager.analysisFile(packet_file);
+    tsharkManager.startCapture("WLAN");
+    std::string input;
+    while (1) {
+        std::cout << "Enter 'q' to stop capturing and exit: ";
+        std::cin >> input;
+        if (input == "q" || input == "Q") {
+            tsharkManager.stopCapture();
+            break;
+        }
+    }
 
     tsharkManager.printAllPacket();
 
+    /*
     std::vector<AdapterInfo> adapters = tsharkManager.getNetWorkAdapters();
     for (auto item: adapters) {
         LOG_F(INFO, "Adapter ID: %d, Name: %s, Remark: %s", item.id, item.name.c_str(), item.remark.c_str());
     }
+    */
 
     return 0;
 }

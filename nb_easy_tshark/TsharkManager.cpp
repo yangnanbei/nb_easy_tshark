@@ -118,7 +118,7 @@ bool TsharkManager::analysisFile(std::string filePath) {
     while (fgets(buffer, sizeof(buffer), pipe) != nullptr) {
         std::shared_ptr<Packet> packet = std::make_shared<Packet>();
         if (!parseLine(buffer, packet)) {
-            fprintf(stderr, "Error parsing line: %s\n", buffer);
+            LOG_F(ERROR, "Error parsing line: %s\n", buffer);
             assert(false);
         }
 
@@ -254,3 +254,84 @@ std::vector<AdapterInfo> TsharkManager::getNetWorkAdapters() {
     _pclose(pipe);
     return interfaces;
 }
+
+bool TsharkManager::startCapture(std::string adapterName) {
+    
+    LOG_F(INFO, "start to capture, adapterName %s", adapterName.c_str());
+    captureWorkerThread =  std::make_shared<std::thread>(&TsharkManager::captureWorkerThreadEntry,
+        this, "\"" + adapterName + "\"");
+    return true;
+}
+
+void TsharkManager::captureWorkerThreadEntry(std::string adapterName) {
+    std::string captureFile = "capture.pcap";
+
+    std::vector<std::string> tsharkArgs = {
+        tsharkPath,
+        "-i", adapterName          ,
+        "-w", captureFile          , /* write to captureFile */
+        "-F", "pcap"               , /* save file as pcap format */
+        "-T", "fields"             ,
+        "-e", "frame.number"       ,
+        "-e", "frame.time_epoch"   ,
+        "-e", "frame.len"          ,
+        "-e", "frame.cap_len"      ,
+        "-e", "eth.src"            ,
+        "-e", "eth.dst"            ,
+        "-e", "ip.src"             ,
+        "-e", "ipv6.src"           ,
+        "-e", "ip.dst"             ,
+        "-e", "ipv6.dst"           ,
+        "-e", "tcp.srcport"        ,
+        "-e", "udp.srcport"        ,
+        "-e", "tcp.dstport"        ,
+        "-e", "udp.dstport"        ,
+        "-e", "_ws.col.Protocol"   ,
+        "-e", "_ws.col.Info"       ,
+    };
+
+    std::string command;
+    for (auto arg : tsharkArgs) {
+        command += arg + " ";
+    }
+
+    FILE* pipe = _popen(command.c_str(), "r");
+    if (!pipe) {
+        std::cerr << "Fail to run tshark!" << std::endl;
+        return;
+    }
+
+    char buffer[4096];
+    uint32_t file_offset = sizeof(PcapHeader);
+    while (fgets(buffer, sizeof(buffer), pipe) != nullptr && !stopFlag) {
+        std::shared_ptr<Packet> packet = std::make_shared<Packet>();
+        if (!parseLine(buffer, packet)) {
+            LOG_F(ERROR, "Error parsing line: %s\n", buffer);
+            assert(false);
+        }
+
+        /* upadate offset */
+        packet->file_offset = file_offset + sizeof(PacketHeader);
+        file_offset += sizeof(PacketHeader) + packet->cap_len;
+
+        /* get ip location */
+        packet->src_location = ip2regionUtil.getIpLocation(packet->src_ip);
+        packet->dst_location = ip2regionUtil.getIpLocation(packet->dst_ip);
+
+        allPackets.insert(std::make_pair<>(packet->frame_number, packet));
+    }
+    _pclose(pipe);
+
+    currentFilePath = captureFile;
+
+    return;
+}
+
+bool TsharkManager::stopCapture() {
+    LOG_F(INFO, "now stop capture pcap");
+    stopFlag = true;
+    captureWorkerThread->join();
+
+    return true;
+}
+
