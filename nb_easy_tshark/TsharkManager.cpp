@@ -1,4 +1,5 @@
 ﻿#include "TsharkManager.hpp"
+#include "ProcessUtil.hpp"
 #include <loguru/loguru.hpp>
 
 TsharkManager::TsharkManager(std::string workDir) {
@@ -220,9 +221,9 @@ std::vector<AdapterInfo> TsharkManager::getNetWorkAdapters() {
         if (line.empty()) {
             continue;
         }
-        int start = line.find(' ');
+        size_t start = line.find(' ');
         if (start != std::string::npos) {
-            int end = line.find(' ', start + 1);
+            size_t end = line.find(' ', start + 1);
             std::string ifName;
             if (end != std::string::npos) {
                  ifName = line.substr(start + 1, end - start - 1);
@@ -239,8 +240,8 @@ std::vector<AdapterInfo> TsharkManager::getNetWorkAdapters() {
             adapter.id = ++id;
             adapter.name = ifName;
 
-            int bracketStart = line.find('(');
-            int bracketEnd   = line.rfind(')'); /* on I'm fucking genius */
+            size_t bracketStart = line.find('(');
+            size_t bracketEnd   = line.rfind(')'); /* on I'm fucking genius */
             if (bracketStart != std::string::npos && bracketEnd != std::string::npos && bracketEnd > bracketStart) {
                 adapter.remark = line.substr(bracketStart + 1, bracketEnd - bracketStart - 1);
             } else {
@@ -297,6 +298,7 @@ void TsharkManager::captureWorkerThreadEntry(std::string adapterName) {
     }
 
     FILE* pipe = _popen(command.c_str(), "r");
+    //todo: FILE* pipe = ProcessUtil::PopenEx(command.c_str(), &captureTsharkPid);
     if (!pipe) {
         std::cerr << "Fail to run tshark!" << std::endl;
         return;
@@ -331,6 +333,7 @@ void TsharkManager::captureWorkerThreadEntry(std::string adapterName) {
 bool TsharkManager::stopCapture() {
     LOG_F(INFO, "now stop capture pcap");
     stopFlag = true;
+    ProcessUtil::Kill(captureTsharkPid);
     captureWorkerThread->join();
 
     return true;

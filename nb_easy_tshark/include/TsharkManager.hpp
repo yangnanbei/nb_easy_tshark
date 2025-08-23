@@ -45,6 +45,7 @@ private:
     std::string tsharkPath;
     std::string currentFilePath;
     bool stopFlag = false;              /* stop capture process */
+    PID_T captureTsharkPid;
 
     IP2RegionUtil ip2regionUtil;
 

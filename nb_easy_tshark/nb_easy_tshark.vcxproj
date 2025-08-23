@@ -129,6 +129,7 @@
   <ItemGroup>
     <ClCompile Include="ip2region_util.cpp" />
     <ClCompile Include="nb_easy_tshark.cpp" />
+    <ClCompile Include="ProcessUtil.cpp" />
     <ClCompile Include="test\01test_read_hex.cpp" />
     <ClCompile Include="test\02_ip2region.cpp" />
     <ClCompile Include="test\03_ip2region_class.cpp" />
@@ -141,6 +142,7 @@
   <ItemGroup>
     <ClInclude Include="include\ip2region_util.h" />
     <ClInclude Include="include\tshark_datatype.hpp" />
+    <ClInclude Include="ProcessUtil.hpp" />
     <ClInclude Include="third_library\httplib\httplib.h" />
     <ClInclude Include="third_library\ip2region\xdb_bench.h" />
     <ClInclude Include="third_library\ip2region\xdb_search.h" />

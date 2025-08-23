@@ -4,6 +4,14 @@
 #include <vector>
 #include <string>
 #include <sstream>
+#include <sys/types.h>
+#include <Windows.h>
+
+#ifdef _WIN32
+typedef DWORD PID_T;
+#else
+typedef pid_t PID_T;
+#endif /* _WIN32 */
 
 struct PcapHeader {
     uint32_t magic_number;
