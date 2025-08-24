@@ -71,8 +71,8 @@ bool TsharkManager::parseLine(std::string line, std::shared_ptr<Packet> packet) 
         }
         else {
             std::cerr << "Error: Not enough fields in line." << std::endl;
+            return false;
         }
-        return false;
     }
 
     return true;
@@ -297,8 +297,8 @@ void TsharkManager::captureWorkerThreadEntry(std::string adapterName) {
         command += arg + " ";
     }
 
-    FILE* pipe = _popen(command.c_str(), "r");
-    //todo: FILE* pipe = ProcessUtil::PopenEx(command.c_str(), &captureTsharkPid);
+    //FILE* pipe = _popen(command.c_str(), "r");
+    todo: FILE* pipe = ProcessUtil::PopenEx(command.c_str(), &captureTsharkPid);
     if (!pipe) {
         std::cerr << "Fail to run tshark!" << std::endl;
         return;
@@ -307,6 +307,11 @@ void TsharkManager::captureWorkerThreadEntry(std::string adapterName) {
     char buffer[4096];
     uint32_t file_offset = sizeof(PcapHeader);
     while (fgets(buffer, sizeof(buffer), pipe) != nullptr && !stopFlag) {
+        std::string line = buffer;
+        if (line.find("Capturing on") != std::string::npos) {
+            continue;
+        }
+
         std::shared_ptr<Packet> packet = std::make_shared<Packet>();
         if (!parseLine(buffer, packet)) {
             LOG_F(ERROR, "Error parsing line: %s\n", buffer);

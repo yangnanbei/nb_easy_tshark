@@ -73,10 +73,16 @@ FILE* ProcessUtil::PopenEx(std::string command, PID_T* pidOut) {
     siStartInfo.hStdOutput = hWritePipe;
     siStartInfo.dwFlags |= STARTF_USESTDHANDLES;
 
+    // 将 command 转换为宽字符
+    int wlen = MultiByteToWideChar(CP_UTF8, 0, command.c_str(), -1, nullptr, 0);
+    std::wstring wcommand(wlen, L'\0');
+    MultiByteToWideChar(CP_UTF8, 0, command.c_str(), -1, &wcommand[0], wlen);
+
     /* create the child process */
     if (!CreateProcess(
         nullptr,                        // No module name (use command line)
-        (LPWSTR)command.data(),          // Command line
+        &wcommand[0],                   // Command line (LPWSTR)
+        //(LPSTR)command.data(),          // Command line
         nullptr,                        // Process handle not inheritable
         nullptr,                        // Thread handle not inheritable
         TRUE,                           // Set handle inheritance
