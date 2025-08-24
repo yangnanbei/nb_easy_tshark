@@ -5,6 +5,7 @@
 #include "rapidjson/prettywriter.h"
 #include "rapidjson/stringbuffer.h"
 #include "ip2region_util.h"
+#include "AdapterMonitorInfo.hpp"
 
 #include <cstdio>
 #include <cstdlib>
@@ -15,6 +16,8 @@
 #include <unordered_map>
 #include <set>
 #include <thread>
+#include <map>
+#include <mutex>
 
 class TsharkManager
 {
@@ -50,5 +53,10 @@ private:
     IP2RegionUtil ip2regionUtil;
 
     std::unordered_map<uint32_t, std::shared_ptr<Packet>> allPackets;
+    /* monitor the flow trend */
+    std::map<std::string, AdapterMonitorInfo> adapterFlowTrendMonitorMap;
+
+    /* protect trend map */
+    std::recursive_mutex adapterFlowTrendMapLock;
 };
 

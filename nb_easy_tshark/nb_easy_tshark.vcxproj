@@ -127,6 +127,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AdapterMonitorInfo.cpp" />
     <ClCompile Include="ip2region_util.cpp" />
     <ClCompile Include="nb_easy_tshark.cpp" />
     <ClCompile Include="ProcessUtil.cpp" />
@@ -140,6 +141,7 @@
     <ClCompile Include="TsharkManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AdapterMonitorInfo.hpp" />
     <ClInclude Include="include\ip2region_util.h" />
     <ClInclude Include="include\tshark_datatype.hpp" />
     <ClInclude Include="ProcessUtil.hpp" />
