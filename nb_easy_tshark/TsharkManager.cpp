@@ -344,3 +344,122 @@ bool TsharkManager::stopCapture() {
     return true;
 }
 
+void TsharkManager::startMonitorAdaptersFlowTrend() {
+    std::unique_lock<std::recursive_mutex> lock(adapterFlowTrendMapLock);
+
+    adapterFlowTrendMonitorStartTime = std::time(nullptr);
+
+    /* get adapter list */
+    std::vector<AdapterInfo> adapterList = getNetWorkAdapters();
+
+    /* start thread for every single adapter */
+    for (auto adapter : adapterList) {
+        adapterFlowTrendMonitorMap.insert(std::make_pair<>(adapter.name, AdapterMonitorInfo()));
+        AdapterMonitorInfo& monitorInfo = adapterFlowTrendMonitorMap.at(adapter.name);
+        
+        monitorInfo.monitorThread = std::make_shared<std::thread>(
+            &TsharkManager::adapterFlowTrendMonitorThreadEntry,
+            this,
+            adapter.name);
+
+        if (monitorInfo.monitorThread == nullptr) {
+            LOG_F(ERROR, "Create monitor threads fail! adapter name %s", adapter.name.c_str())l
+        }
+        else {
+            LOG_F(INFO, "Create monitor threads success! adapter name %s, monitorThread %p", adapter.name.c_str(),
+                monitorInfo.monitorThread.get());
+        }
+    }
+
+}
+
+void TsharkManager::adapterFlowTrendMonitorThreadEntry(std::string adapterName) {
+    adapterFlowTrendMapLock.lock();
+
+    if (adapterFlowTrendMonitorMap.find(adapterName) == adapterFlowTrendMonitorMap.end()) {
+        adapterFlowTrendMapLock.unlock();
+        return;
+    }
+
+    adapterFlowTrendMapLock.unlock();
+
+    char buffer[1024]{};
+    /* map: pair of timestamp and length */
+    std::map<long, long>& trafficPerSecond = adapterFlowTrendMonitorMap.at(adapterName).flowTrendData;
+
+    std::string command = tsharkPath + " -i \"" + adapterName + "\" -T fields -e frame.time_epoch -e frame.len";
+    LOG_F(INFO, "Start monitor adapter %s", adapterName.c_str());
+
+    PID_T tsharkPid = 0;
+    FILE* pipe = ProcessUtil::PopenEx(command.c_str(), &tsharkPid);
+    if (!pipe) {
+        throw std::runtime_error("Failed to run command: " + command);
+    }
+
+    /* save pipe */
+    adapterFlowTrendMapLock.lock();
+    adapterFlowTrendMonitorMap[adapterName].monitorTsharkPipe = pipe;
+    adapterFlowTrendMonitorMap[adapterName].tsharkPid = tsharkPid;
+    adapterFlowTrendMapLock.unlock();
+
+    while (fgets(buffer, sizeof(buffer), pipe) != nullptr) {
+        std::string line = buffer;
+        std::istringstream iss(line);
+        std::string timestampStr, lengthStr;
+
+        if (line.find("Capturing on") != std::string::npos ||
+            line.find("captured") != std::string::npos) {
+            continue;
+        }
+
+        /* now we need to parse the timestamp and length for every line */
+        if (!(iss >> timestampStr >> lengthStr)) {
+            continue;
+        }
+
+        try {
+            long timestamp = static_cast<long>(std::stol(timestampStr));
+            long packetLength = static_cast<long>(std::stol(lengthStr));
+            /* iterate to add the Bytes of every second */
+            trafficPerSecond[timestamp] += packetLength;
+
+            /* we don't need to save all the pair<timestamp, bytes> data,
+               the recent 300s is defiently enough */
+            while (trafficPerSecond.size() > 300) {
+                auto it = trafficPerSecond.begin();
+                LOG_F(INFO, "Erase old traffic data, timestamp %ld, bytes %ld", it->first, it->second);
+                trafficPerSecond.erase(it);
+            }
+        }
+        catch (const std::exception& e) {
+            LOG_F(ERROR, "Exception parsing tshark output: %s", line.c_str());
+            continue;
+        }
+    }
+    LOG_F(INFO, "Monitor adapter %s finished!", adapterName.c_str());
+}
+
+void TsharkManager::stopMonitorAdaptersFlowTrend() {
+    std::unique_lock<std::recursive_mutex> lock(adapterFlowTrendMapLock);
+    for (auto& adapterPipePair : adapterFlowTrendMonitorMap) {
+    }
+}
+void TsharkManager::stopMonitorAdaptersFlowTrend() {
+
+    std::unique_lock<std::recursive_mutex> lock(adapterFlowTrendMapLock);
+
+    for (auto adapterPipePair : adapterFlowTrendMonitorMap) {
+        ProcessUtil::Kill(adapterPipePair.second.tsharkPid);
+    }
+
+    for (auto adapterPipePair : adapterFlowTrendMonitorMap) {
+
+        _pclose(adapterPipePair.second.monitorTsharkPipe);
+
+        adapterPipePair.second.monitorThread->join();
+
+        LOG_F(INFO, "adapter：%s monitr stop!", adapterPipePair.first.c_str());
+    }
+
+    adapterFlowTrendMonitorMap.clear();
+}

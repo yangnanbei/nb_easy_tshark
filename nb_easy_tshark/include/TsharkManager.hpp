@@ -37,10 +37,16 @@ public:
 
     bool stopCapture();
 
+    /* monitor the adapter traffic */
+    void startMonitorAdaptersFlowTrend();
+    void stopMonitorAdaptersFlowTrend();
+
 private:
     bool parseLine(std::string line, std::shared_ptr<Packet> packet);
 
     void captureWorkerThreadEntry(std::string adapterName);
+
+    void adapterFlowTrendMonitorThreadEntry(std::string adapterName);
 
     std::shared_ptr<std::thread> captureWorkerThread;
 
@@ -49,11 +55,12 @@ private:
     std::string currentFilePath;
     bool stopFlag = false;              /* stop capture process */
     PID_T captureTsharkPid;
+    time_t adapterFlowTrendMonitorStartTime;
 
     IP2RegionUtil ip2regionUtil;
 
     std::unordered_map<uint32_t, std::shared_ptr<Packet>> allPackets;
-    /* monitor the flow trend */
+    /* monitor the flow trend, map <adapter name, adapter info> */
     std::map<std::string, AdapterMonitorInfo> adapterFlowTrendMonitorMap;
 
     /* protect trend map */
