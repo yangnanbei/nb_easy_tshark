@@ -195,7 +195,7 @@ std::vector<AdapterInfo> TsharkManager::getNetWorkAdapters() {
     /* real world interface */
     std::vector<AdapterInfo> interfaces;
 
-    char buffer[512]{};
+    char buffer[512] = {0};
     std::string result;
 
     std::string command = tsharkPath + " -D";
@@ -203,10 +203,13 @@ std::vector<AdapterInfo> TsharkManager::getNetWorkAdapters() {
     if (!pipe) {
         throw std::runtime_error("Failed to run command: " + command);
     }
+    LOG_F(INFO, "popen finish");
 
     while (fgets(buffer, sizeof(buffer), pipe) != nullptr) {
+        LOG_F(INFO, "buffer is %s", buffer);
         result += buffer;
     }
+    LOG_F(INFO, "fgets finish");
 
     /* get name and remark
      * e.g: 6. \Device\NPF_{FFCB4D95-E737-4DCA-B016-522C9BA641B5} (WLAN)
@@ -298,7 +301,7 @@ void TsharkManager::captureWorkerThreadEntry(std::string adapterName) {
     }
 
     //FILE* pipe = _popen(command.c_str(), "r");
-    todo: FILE* pipe = ProcessUtil::PopenEx(command.c_str(), &captureTsharkPid);
+    FILE* pipe = ProcessUtil::PopenEx(command.c_str(), &captureTsharkPid);
     if (!pipe) {
         std::cerr << "Fail to run tshark!" << std::endl;
         return;
@@ -345,25 +348,29 @@ bool TsharkManager::stopCapture() {
 }
 
 void TsharkManager::startMonitorAdaptersFlowTrend() {
+    LOG_F(INFO, "enter startMonitorAdaptersFlowTrend");
     std::unique_lock<std::recursive_mutex> lock(adapterFlowTrendMapLock);
 
-    adapterFlowTrendMonitorStartTime = std::time(nullptr);
+    adapterFlowTrendMonitorStartTime = static_cast<long>(std::time(nullptr));
 
+    LOG_F(INFO, "get Adapter start");
     /* get adapter list */
     std::vector<AdapterInfo> adapterList = getNetWorkAdapters();
+    LOG_F(INFO, "get Adapter finish");
 
     /* start thread for every single adapter */
     for (auto adapter : adapterList) {
         adapterFlowTrendMonitorMap.insert(std::make_pair<>(adapter.name, AdapterMonitorInfo()));
         AdapterMonitorInfo& monitorInfo = adapterFlowTrendMonitorMap.at(adapter.name);
         
+        LOG_F(INFO, "Start monitor adapter %s", adapter.remark.c_str());
         monitorInfo.monitorThread = std::make_shared<std::thread>(
             &TsharkManager::adapterFlowTrendMonitorThreadEntry,
             this,
             adapter.name);
 
         if (monitorInfo.monitorThread == nullptr) {
-            LOG_F(ERROR, "Create monitor threads fail! adapter name %s", adapter.name.c_str())l
+            LOG_F(ERROR, "Create monitor threads fail! adapter name %s", adapter.name.c_str());
         }
         else {
             LOG_F(INFO, "Create monitor threads success! adapter name %s, monitorThread %p", adapter.name.c_str(),
@@ -440,11 +447,6 @@ void TsharkManager::adapterFlowTrendMonitorThreadEntry(std::string adapterName) 
 }
 
 void TsharkManager::stopMonitorAdaptersFlowTrend() {
-    std::unique_lock<std::recursive_mutex> lock(adapterFlowTrendMapLock);
-    for (auto& adapterPipePair : adapterFlowTrendMonitorMap) {
-    }
-}
-void TsharkManager::stopMonitorAdaptersFlowTrend() {
 
     std::unique_lock<std::recursive_mutex> lock(adapterFlowTrendMapLock);
 
@@ -463,3 +465,36 @@ void TsharkManager::stopMonitorAdaptersFlowTrend() {
 
     adapterFlowTrendMonitorMap.clear();
 }
+
+// 获取所有网卡流量统计数据
+void TsharkManager::getAdaptersFlowTrendData(std::map<std::string, std::map<long, long>>& flowTrendData) {
+
+    long timeNow = time(nullptr);
+
+    // 数据从最左边冒出来
+    // 一开始：以最开始监控时间为左起点，终点为未来300秒
+    // 随着时间推移，数据逐渐填充完这300秒
+    // 超过300秒之后，结束节点就是当前，开始节点就是当前-300
+    long startWindow = timeNow - adapterFlowTrendMonitorStartTime > 300 ? timeNow - 300 : adapterFlowTrendMonitorStartTime;
+    long endWindow = timeNow - adapterFlowTrendMonitorStartTime > 300 ? timeNow : adapterFlowTrendMonitorStartTime + 300;
+
+    adapterFlowTrendMapLock.lock();
+    for (auto adapterPipePair : adapterFlowTrendMonitorMap) {
+        flowTrendData.insert(std::make_pair<>(adapterPipePair.first, std::map<long, long>()));
+
+        // 从当前时间戳向前倒推300秒，构造map
+        for (long t = startWindow; t <= endWindow; t++) {
+            // 如果trafficPerSecond中存在该时间戳，则使用已有数据；否则填充为0
+            if (adapterPipePair.second.flowTrendData.find(t) != adapterPipePair.second.flowTrendData.end()) {
+                flowTrendData[adapterPipePair.first][t] = adapterPipePair.second.flowTrendData.at(t);
+            }
+            else {
+                flowTrendData[adapterPipePair.first][t] = 0;
+            }
+        }
+    }
+
+    adapterFlowTrendMapLock.unlock();
+}
+
+

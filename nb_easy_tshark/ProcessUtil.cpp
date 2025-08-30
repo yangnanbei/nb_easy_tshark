@@ -2,6 +2,7 @@
 #include <io.h>
 #include <fcntl.h>
 #include <winnt.h>
+#include <loguru/loguru.hpp>
 
 FILE* ProcessUtil::PopenEx(std::string command, PID_T* pidOut) {
 #if defined(__unix__) || defined(__APPLE__)
@@ -48,6 +49,7 @@ FILE* ProcessUtil::PopenEx(std::string command, PID_T* pidOut) {
     PROCESS_INFORMATION piProcInfo;
     STARTUPINFO siStartInfo;
     FILE* pipeFp = nullptr;
+    LOG_F(ERROR, "cmd is %s", command.c_str());
 
     /* set safe attr, allow pipe handle inherance */
     saAttr.nLength = sizeof(SECURITY_ATTRIBUTES);
@@ -92,7 +94,7 @@ FILE* ProcessUtil::PopenEx(std::string command, PID_T* pidOut) {
         &siStartInfo,                   // Pointer to STARTUPINFO structure
         &piProcInfo                     // Pointer to PROCESS_INFORMATION structure
     )) {
-        perror("CreateProcess");
+        LOG_F(ERROR, "CreateProcess error %lu", GetLastError());
         CloseHandle(hReadPipe);
         CloseHandle(hWritePipe);
         return nullptr;

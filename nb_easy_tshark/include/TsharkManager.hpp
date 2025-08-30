@@ -40,6 +40,7 @@ public:
     /* monitor the adapter traffic */
     void startMonitorAdaptersFlowTrend();
     void stopMonitorAdaptersFlowTrend();
+    void getAdaptersFlowTrendData(std::map<std::string, std::map<long, long>>& flowTrendData);
 
 private:
     bool parseLine(std::string line, std::shared_ptr<Packet> packet);
@@ -55,7 +56,7 @@ private:
     std::string currentFilePath;
     bool stopFlag = false;              /* stop capture process */
     PID_T captureTsharkPid;
-    time_t adapterFlowTrendMonitorStartTime;
+    long adapterFlowTrendMonitorStartTime;
 
     IP2RegionUtil ip2regionUtil;
 
